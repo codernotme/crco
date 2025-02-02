@@ -2,6 +2,8 @@
 
 A secure and efficient cross-chain bridge for transferring tokens and NFTs between different blockchain networks.
 
+[Site Demo](https://crco-bice.vercel.app/)
+
 ## Features
 
 - 🔄 Cross-chain token transfers
@@ -50,7 +52,7 @@ NEXT_PUBLIC_SEPOLIA_BRIDGE_ADDRESS=your_sepolia_bridge_address
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/codernotme/crco
 cd crco
 ```
 
