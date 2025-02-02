@@ -26,6 +26,10 @@ async function main() {
   await token.grantRole(minterRole, bridge.address);
   await token.grantRole(burnerRole, bridge.address);
   console.log("Roles granted to bridge contract");
+
+  // Save addresses to environment variables
+  console.log(`NEXT_PUBLIC_${network.name.toUpperCase()}_TOKEN_ADDRESS=${token.address}`);
+  console.log(`NEXT_PUBLIC_${network.name.toUpperCase()}_BRIDGE_ADDRESS=${bridge.address}`);
 }
 
 main()

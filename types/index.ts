@@ -1,3 +1,5 @@
+import { ethers } from 'ethers';
+
 export interface Transaction {
   id: string;
   from: string;
@@ -7,6 +9,19 @@ export interface Transaction {
   destinationChain: string;
   status: 'pending' | 'completed' | 'failed';
   timestamp: number;
+  isNFT?: boolean;
+  tokenId?: number;
+  proof?: string[];
+}
+
+export interface TransferReceipt {
+  transferId: string;
+  sender: string;
+  recipient: string;
+  amount: string;
+  timestamp: number;
+  isNFT: boolean;
+  tokenId: number;
 }
 
 export interface ChainInfo {
@@ -24,6 +39,8 @@ export interface WalletState {
   account: string;
   chainId: string;
   balance: Record<string, string>;
+  provider: ethers.providers.Web3Provider | null;
+  signer: ethers.Signer | null;
 }
 
 export interface TransferState {
@@ -32,4 +49,6 @@ export interface TransferState {
   destinationChain: string;
   loading: boolean;
   error: string | null;
+  isNFT?: boolean;
+  tokenId?: number;
 }

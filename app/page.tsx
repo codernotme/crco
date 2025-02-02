@@ -11,7 +11,7 @@ import { useWallet } from '@/hooks/useWallet';
 import { Transaction, TransferState } from '@/types';
 
 export default function Home() {
-  const { connected, account, balance, connectWallet, updateBalances } = useWallet();
+  const { connected, account, chainId, balance, connectWallet, updateBalances } = useWallet();
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [transferState, setTransferState] = useState<TransferState>({
@@ -97,9 +97,12 @@ export default function Home() {
               state={transferState}
               connected={connected}
               balance={balance}
+              chainId={chainId}
               onSourceChainChange={(value) => setTransferState(prev => ({ ...prev, sourceChain: value }))}
               onDestinationChainChange={(value) => setTransferState(prev => ({ ...prev, destinationChain: value }))}
               onAmountChange={(value) => setTransferState(prev => ({ ...prev, amount: value }))}
+              onTokenIdChange={(value) => {}} // Add implementation if needed
+              onAssetTypeChange={(value) => {}} // Add implementation if needed
               onMaxClick={() => setTransferState(prev => ({ 
                 ...prev, 
                 amount: balance[prev.sourceChain] || '0' 
