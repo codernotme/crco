@@ -1,8 +1,9 @@
-import { ArrowRightLeft, Wallet, ChevronDown, RefreshCw } from 'lucide-react';
+import { ArrowRightLeft, Wallet, ChevronDown, RefreshCw, Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SUPPORTED_CHAINS } from '@/config/chains';
+import { useTheme } from 'next-themes';
 
 interface HeaderProps {
   connected: boolean;
@@ -21,6 +22,8 @@ export function Header({
   onConnect,
   onRefreshBalance
 }: HeaderProps) {
+  const { theme, setTheme } = useTheme();
+
   return (
     <div className="flex justify-between items-center mb-8">
       <div className="flex items-center space-x-2">
@@ -28,6 +31,14 @@ export function Header({
         <h1 className="text-2xl font-bold">CrCo Bridge</h1>
       </div>
       <div className="flex items-center space-x-4">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        >
+          {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+        </Button>
+
         {connected && (
           <Dialog>
             <DialogTrigger asChild>
@@ -36,14 +47,17 @@ export function Header({
                 <span>Balances</span>
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="glass-effect">
               <DialogHeader>
                 <DialogTitle>Your Balances</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 {Object.entries(SUPPORTED_CHAINS).map(([chainId, chain]) => (
                   <div key={chainId} className="flex justify-between items-center">
-                    <span>{chain.name}:</span>
+                    <div className="flex items-center space-x-2">
+                      <img src={chain.icon} alt={chain.name} className="w-5 h-5" />
+                      <span>{chain.name}:</span>
+                    </div>
                     {isLoadingBalance ? (
                       <Skeleton className="h-4 w-20" />
                     ) : (

@@ -1,14 +1,16 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
-import { AlertCircle } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Header } from '@/components/Header';
+import { BridgeStats } from '@/components/BridgeStats';
 import { TransferForm } from '@/components/TransferForm';
 import { TransactionHistory } from '@/components/TransactionHistory';
+import { Header } from '@/components/Header';
 import { useWallet } from '@/hooks/useWallet';
 import { Transaction, TransferState } from '@/types';
+import { Toaster } from '@/components/ui/toaster';
+import { ThemeProvider } from '@/components/ThemeProvider';
+import { initiateTransfer } from '@/utils/initiateTransfer';
+import { SUPPORTED_CHAINS } from '@/config/chains';
 
 export default function Home() {
   const { connected, account, chainId, balance, connectWallet, updateBalances } = useWallet();
@@ -16,13 +18,16 @@ export default function Home() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [transferState, setTransferState] = useState<TransferState>({
     amount: '',
-    sourceChain: 'amoy',
-    destinationChain: 'sepolia',
+    sourceChain: 'ethereum',
+    destinationChain: 'polygon',
     loading: false,
-    error: null
+    error: null,
+    isNFT: false,
+    tokenId: '',
   });
 
   const handleRefreshBalance = async () => {
+    if (!account) return;
     setIsLoadingBalance(true);
     try {
       await updateBalances(account);
@@ -37,93 +42,87 @@ export default function Home() {
       return;
     }
 
-    if (!transferState.amount || parseFloat(transferState.amount) <= 0) {
-      setTransferState(prev => ({ 
-        ...prev, 
-        error: 'Please enter a valid amount' 
-      }));
-      return;
-    }
-
-    setTransferState(prev => ({ ...prev, loading: true, error: null }));
+    setTransferState((prev) => ({ ...prev, loading: true, error: null }));
     try {
-      // Bridge contract interaction would go here
-      setTransactions(prev => [{
-        id: `0x${Math.random().toString(16).slice(2)}`,
-        from: account,
-        to: account,
+      const tx = await initiateTransfer({
+        account,
         amount: transferState.amount,
         sourceChain: transferState.sourceChain,
         destinationChain: transferState.destinationChain,
-        status: 'pending',
-        timestamp: Date.now()
-      }, ...prev]);
-      
-      setTransferState(prev => ({ ...prev, amount: '' }));
+        isNFT: transferState.isNFT,
+        tokenId: transferState.tokenId
+      });
+
+      setTransactions((prev) => [
+        {
+          id: tx.transactionHash,
+          from: account,
+          to: account,
+          amount: transferState.amount,
+          sourceChain: transferState.sourceChain,
+          destinationChain: transferState.destinationChain,
+          status: 'pending',
+          timestamp: Date.now(),
+          isNFT: transferState.isNFT,
+          tokenId: transferState.tokenId ? parseInt(transferState.tokenId) : undefined,
+        },
+        ...prev,
+      ]);
+
+      setTransferState((prev) => ({ ...prev, amount: '' }));
     } catch (err) {
-      setTransferState(prev => ({ 
-        ...prev, 
-        error: err instanceof Error ? err.message : 'Transfer failed' 
+      setTransferState((prev) => ({
+        ...prev,
+        error: err instanceof Error ? err.message : 'Transfer failed',
       }));
     } finally {
-      setTransferState(prev => ({ ...prev, loading: false }));
+      setTransferState((prev) => ({ ...prev, loading: false }));
     }
   };
 
   return (
-    <div className="min-h-screen gradient-bg text-white">
-      <div className="container mx-auto px-4 py-8">
-        <Header
-          connected={connected}
-          account={account}
-          balance={balance}
-          isLoadingBalance={isLoadingBalance}
-          onConnect={connectWallet}
-          onRefreshBalance={handleRefreshBalance}
-        />
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="dark"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <div className="min-h-screen bg-gradient-to-b from-background to-accent">
+        <div className="container mx-auto px-4 py-8">
+          <Header
+            connected={connected}
+            account={account}
+            balance={balance}
+            isLoadingBalance={isLoadingBalance}
+            onConnect={connectWallet}
+            onRefreshBalance={handleRefreshBalance}
+          />
 
-        <Tabs defaultValue="bridge" className="max-w-4xl mx-auto">
-          <TabsList className="grid w-full grid-cols-2 mb-8 glass-effect">
-            <TabsTrigger value="bridge" className="text-lg data-[state=active]:bg-white/10">
-              Bridge Assets
-            </TabsTrigger>
-            <TabsTrigger value="history" className="text-lg data-[state=active]:bg-white/10">
-              Transaction History
-            </TabsTrigger>
-          </TabsList>
+          <BridgeStats />
 
-          <TabsContent value="bridge">
-            <TransferForm
-              state={transferState}
-              connected={connected}
-              balance={balance}
-              chainId={chainId}
-              onSourceChainChange={(value) => setTransferState(prev => ({ ...prev, sourceChain: value }))}
-              onDestinationChainChange={(value) => setTransferState(prev => ({ ...prev, destinationChain: value }))}
-              onAmountChange={(value) => setTransferState(prev => ({ ...prev, amount: value }))}
-              onTokenIdChange={(value) => {}} // Add implementation if needed
-              onAssetTypeChange={(value) => {}} // Add implementation if needed
-              onMaxClick={() => setTransferState(prev => ({ 
-                ...prev, 
-                amount: balance[prev.sourceChain] || '0' 
-              }))}
-              onTransfer={handleTransfer}
-            />
-          </TabsContent>
+          <TransferForm
+            state={transferState}
+            onSourceChainChange={(value) => setTransferState((prev) => ({ ...prev, sourceChain: value }))}
+            onDestinationChainChange={(value) => setTransferState((prev) => ({ ...prev, destinationChain: value }))}
+            onAmountChange={(value) => setTransferState((prev) => ({ ...prev, amount: value }))}
+            onTokenIdChange={(value) => setTransferState((prev) => ({ ...prev, tokenId: value }))}
+            onAssetTypeChange={(isNFT) => setTransferState((prev) => ({ ...prev, isNFT }))}
+            onTransfer={handleTransfer}
+            onMaxClick={() =>
+              setTransferState((prev) => ({
+                ...prev,
+                amount: balance?.[prev.sourceChain] || '0',
+              }))
+            }
+          />
 
-          <TabsContent value="history">
+          <div className="mt-8">
             <TransactionHistory transactions={transactions} />
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
 
-        {transferState.error && (
-          <Alert variant="destructive" className="mt-4 max-w-4xl mx-auto glass-effect border-red-500/20">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{transferState.error}</AlertDescription>
-          </Alert>
-        )}
+        <Toaster />
       </div>
-    </div>
+    </ThemeProvider>
   );
 }
