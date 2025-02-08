@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { SUPPORTED_CHAINS, HIGH_VALUE_THRESHOLD } from '@/config/chains';
 import { TransferState } from '@/types';
 import { ArrowDownUp, ArrowRight, Shield } from 'lucide-react';
@@ -22,7 +21,7 @@ interface TransferFormProps {
   onDestinationChainChange: (value: string) => void;
   onAmountChange: (value: string) => void;
   onTokenIdChange: (value: string) => void;
-  onAssetTypeChange: (isNFT: boolean) => void;
+  onAssetTypeChange: (type: 'token' | 'nft') => void;
   onTransfer: () => Promise<void>;
   onMaxClick: () => void;
 }
@@ -164,7 +163,7 @@ export function TransferForm({
           <AssetSelector
             balance={balance[state.sourceChain] || '0'}
             tokenSymbol={SUPPORTED_CHAINS[state.sourceChain].tokenSymbol}
-            onAssetTypeChange={onAssetTypeChange}
+            onAssetTypeChange={(type) => onAssetTypeChange(type ? 'nft' : 'token')}
             onAmountChange={onAmountChange}
             onTokenIdChange={onTokenIdChange}
             onMaxClick={onMaxClick}
@@ -173,8 +172,8 @@ export function TransferForm({
 
           {state.isNFT && state.tokenId && (
             <NFTPreview
-              tokenId={state.tokenId}
-              chainId={state.sourceChain}
+              tokenId={String(state.tokenId)}
+              chainId={String(state.sourceChain)}
               contractAddress={SUPPORTED_CHAINS[state.sourceChain].tokenAddress}
             />
           )}

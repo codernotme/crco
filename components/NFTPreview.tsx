@@ -21,6 +21,7 @@ export function NFTPreview({ tokenId, chainId, contractAddress }: NFTPreviewProp
   const [loading, setLoading] = useState(true);
 
   const [props, api] = useSpring(() => ({
+    rotateX: 0,
     rotateY: 0,
     scale: 1,
     config: { mass: 5, tension: 350, friction: 40 }

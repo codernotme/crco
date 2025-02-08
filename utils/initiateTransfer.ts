@@ -5,8 +5,8 @@ import { CONTRACTS } from '@/constants/contracts';
 interface TransferParams {
   account: string;
   amount: string;
-  sourceChain: string;
-  destinationChain: string;
+  sourceChain: keyof typeof CONTRACTS;
+  destinationChain: keyof typeof CONTRACTS;
   isNFT: boolean;
   tokenId?: string;
 }

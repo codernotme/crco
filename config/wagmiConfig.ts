@@ -1,4 +1,4 @@
-import { createConfig } from 'viem';
+import { createConfig } from '@wagmi/core';
 import { mainnet, polygon, bsc, avalanche } from 'viem/chains';
 import { http } from 'viem';
 

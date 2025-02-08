@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { ArrowUpDown, Clock, Coins, Users } from 'lucide-react';
-import { formatEther } from 'ethers';
+import { formatEther } from 'viem';
 import { ethers } from 'ethers';
 import { useWallet } from '@/hooks/useWallet';
 import { SUPPORTED_CHAINS } from '@/config/chains';
@@ -46,14 +46,14 @@ export function BridgeStats() {
           const filter = bridgeContract.filters.TransferCompleted();
           const events = await bridgeContract.queryFilter(filter);
 
-          events.forEach((event) => {
+          events.forEach(async (event) => {
             totalVolume += BigInt(event.args?.amount || 0);
             totalTx++;
             uniqueUsers.add(event.args?.recipient);
 
-            const block = event.getBlock();
+            const block = await event.getBlock();
             if (block) {
-              processingTimes.push(block.timestamp - event.args?.timestamp);
+              processingTimes.push(block.timestamp - (event.args?.timestamp || 0));
             }
           });
         }
@@ -65,7 +65,7 @@ export function BridgeStats() {
             : 0;
 
         setStats({
-          totalVolume: formatEther(totalVolume.toString()),
+          totalVolume: formatEther(totalVolume),
           totalTransactions: totalTx,
           activeUsers: uniqueUsers.size,
           averageTime: Math.round(avgTime / 60), // Convert to minutes

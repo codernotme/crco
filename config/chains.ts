@@ -10,6 +10,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainInfo> = {
     tokenAddress: process.env.NEXT_PUBLIC_ETHEREUM_TOKEN_ADDRESS ?? '',
     bridgeAddress: process.env.NEXT_PUBLIC_ETHEREUM_BRIDGE_ADDRESS ?? '',
     icon: '/chains/ethereum.svg',
+    coingeckoId: 'ethereum',
     nativeCurrency: {
       name: 'Ether',
       symbol: 'ETH',
@@ -25,6 +26,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainInfo> = {
     tokenAddress: process.env.NEXT_PUBLIC_POLYGON_TOKEN_ADDRESS ?? '',
     bridgeAddress: process.env.NEXT_PUBLIC_POLYGON_BRIDGE_ADDRESS ?? '',
     icon: '/chains/polygon.svg',
+    coingeckoId: 'matic-network',
     nativeCurrency: {
       name: 'MATIC',
       symbol: 'MATIC',
@@ -40,6 +42,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainInfo> = {
     tokenAddress: process.env.NEXT_PUBLIC_BSC_TOKEN_ADDRESS ?? '',
     bridgeAddress: process.env.NEXT_PUBLIC_BSC_BRIDGE_ADDRESS ?? '',
     icon: '/chains/bsc.svg',
+    coingeckoId: 'binancecoin',
     nativeCurrency: {
       name: 'BNB',
       symbol: 'BNB',
@@ -55,6 +58,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainInfo> = {
     tokenAddress: process.env.NEXT_PUBLIC_AVALANCHE_TOKEN_ADDRESS ?? '',
     bridgeAddress: process.env.NEXT_PUBLIC_AVALANCHE_BRIDGE_ADDRESS ?? '',
     icon: '/chains/avalanche.svg',
+    coingeckoId: 'avalanche-2',
     nativeCurrency: {
       name: 'AVAX',
       symbol: 'AVAX',
