@@ -1,165 +1,52 @@
 'use client';
 
-import { useState } from 'react';
-import { BridgeStats } from '@/components/BridgeStats';
-import { TransferForm } from '@/components/TransferForm';
-import { TransactionHistory } from '@/components/TransactionHistory';
-import { Header } from '@/components/Header';
-import { PriceChart } from '@/components/PriceChart';
-import { GasTracker } from '@/components/GasTracker';
-import { TransactionSpeedEstimator } from '@/components/TransactionSpeedEstimator';
-import { BridgeFeeCalculator } from '@/components/BridgeFeeCalculator';
-import { PortfolioAnalytics } from '@/components/PortfolioAnalytics';
-import { TransactionFilters } from '@/components/TransactionFilters';
-import { PriceFeed } from '@/components/PriceFeed';
-import { Guide } from '@/components/Guide';
-import { useWallet } from '@/hooks/useWallet';
-import { Transaction, TransferState } from '@/types';
-import { Toaster } from '@/components/ui/toaster';
-import { ThemeProvider } from '@/components/ThemeProvider';
-import { initiateTransfer } from '@/utils/initiateTransfer';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { ArrowRight } from 'lucide-react';
 
-export default function Home() {
-  const { connected, account, chainId, balance, connectWallet, updateBalances } = useWallet();
-  const [isLoadingBalance, setIsLoadingBalance] = useState(false);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [transferState, setTransferState] = useState<TransferState>({
-    amount: '',
-    sourceChain: 'ethereum' as 'ethereum' | 'polygon',
-    destinationChain: 'polygon' as 'ethereum' | 'polygon',
-    loading: false,
-    error: null,
-    isNFT: false,
-    tokenId: undefined
-  });
-
-  const handleRefreshBalance = async () => {
-    if (!account) return;
-    setIsLoadingBalance(true);
-    try {
-      await updateBalances(account);
-    } finally {
-      setIsLoadingBalance(false);
-    }
-  };
-
-  const handleTransfer = async () => {
-    if (!connected) {
-      await connectWallet();
-      return;
-    }
-
-    setTransferState((prev) => ({ ...prev, loading: true, error: null }));
-    try {
-      const tx = await initiateTransfer({
-        account,
-        amount: transferState.amount,
-        sourceChain: transferState.sourceChain as 'ethereum' | 'polygon',
-        destinationChain: transferState.destinationChain as 'ethereum' | 'polygon',
-        isNFT: transferState.isNFT,
-        tokenId: transferState.tokenId?.toString()
-      });
-
-      setTransactions((prev) => [
-        {
-          id: tx.transactionHash,
-          from: account,
-          to: account,
-          amount: transferState.amount,
-          sourceChain: transferState.sourceChain,
-          destinationChain: transferState.destinationChain,
-          status: 'pending',
-          timestamp: Date.now(),
-          isNFT: transferState.isNFT,
-          tokenId: transferState.tokenId ? transferState.tokenId : undefined,
-        },
-        ...prev,
-      ]);
-
-      setTransferState((prev) => ({ ...prev, amount: '' }));
-    } catch (err) {
-      setTransferState((prev) => ({
-        ...prev,
-        error: err instanceof Error ? err.message : 'Transfer failed',
-      }));
-    } finally {
-      setTransferState((prev) => ({ ...prev, loading: false }));
-    }
-  };
+export default function LandingPage() {
+  const router = useRouter();
 
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="dark"
-      enableSystem
-      disableTransitionOnChange
-    >
-      <div className="min-h-screen gradient-bg">
-        <div className="container mx-auto px-4 py-8">
-          <Header
-            connected={connected}
-            account={account}
-            balance={balance}
-            isLoadingBalance={isLoadingBalance}
-            onConnect={connectWallet}
-            onRefreshBalance={handleRefreshBalance}
-          />
+    <div className="min-h-screen gradient-bg flex flex-col">
+      <div className="flex-1 flex flex-col items-center justify-center px-4">
+        <div className="max-w-4xl w-full text-center space-y-8">
+          <h1 className="text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
+            Cross-Chain Bridge
+          </h1>
+          
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            Transfer tokens and NFTs securely across multiple blockchains with our advanced bridge technology
+          </p>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <div className="lg:col-span-2">
-              <PriceChart symbol="ETHUSDT" />
-            </div>
-            <div>
-              <GasTracker />
-            </div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
+            <Button 
+              size="lg"
+              onClick={() => router.push('/bridge')}
+              className="glass-effect text-lg py-6 px-8 group"
+            >
+              Launch App
+              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            </Button>
           </div>
 
-          <PriceFeed />
-          <div className="my-8">
-            <PortfolioAnalytics />
-          </div>
-
-          <BridgeStats />
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <div className="lg:col-span-2">
-              <TransferForm
-                state={transferState}
-                onSourceChainChange={(value) => setTransferState((prev) => ({ ...prev, sourceChain: value }))}
-                onDestinationChainChange={(value) => setTransferState((prev) => ({ ...prev, destinationChain: value }))}
-                onAmountChange={(value) => setTransferState((prev) => ({ ...prev, amount: value }))}
-                onTokenIdChange={(value) => setTransferState((prev) => ({ ...prev, tokenId: Number(value) }))}
-                onAssetTypeChange={(isNFT) => setTransferState((prev) => ({ ...prev, isNFT: isNFT === 'nft' }))}
-                onTransfer={handleTransfer}
-                onMaxClick={() =>
-                  setTransferState((prev) => ({
-                    ...prev,
-                    amount: balance?.[prev.sourceChain] || '0',
-                  }))
-                }
-              />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
+            <div className="card-gradient p-6 rounded-lg">
+              <h3 className="text-xl font-semibold mb-2">Secure</h3>
+              <p className="text-gray-400">Multi-signature validation and proof verification for maximum security</p>
             </div>
-            <div>
-              <div className="space-y-6">
-                <TransactionSpeedEstimator />
-                <BridgeFeeCalculator />
-              </div>
+            <div className="card-gradient p-6 rounded-lg">
+              <h3 className="text-xl font-semibold mb-2">Fast</h3>
+              <p className="text-gray-400">Quick transaction processing with real-time status updates</p>
             </div>
-          </div>
-
-          <div className="space-y-6">
-            <TransactionFilters
-              onFilterChange={(filters) => {
-                console.log('Filters:', filters);
-              }}
-            />
-            <TransactionHistory transactions={transactions} />
+            <div className="card-gradient p-6 rounded-lg">
+              <h3 className="text-xl font-semibold mb-2">Multi-Chain</h3>
+              <p className="text-gray-400">Support for multiple blockchain networks including Ethereum, Polygon, and more</p>
+            </div>
           </div>
         </div>
-
-        <Guide />
-        <Toaster />
       </div>
-    </ThemeProvider>
+    </div>
   );
 }

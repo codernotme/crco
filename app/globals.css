@@ -16,56 +16,7 @@
     --accent: 216 34% 17%;
     --accent-foreground: 210 40% 98%;
 
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --popover: 224 71% 4%;
-    --popover-foreground: 215 20.2% 65.1%;
-
-    --card: 224 71% 4%;
-    --card-foreground: 213 31% 91%;
-
-    --border: 216 34% 17%;
-    --input: 216 34% 17%;
-    --ring: 216 34% 17%;
-
     --radius: 0.75rem;
-  }
-
-  .light {
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
-    
-    --primary: 222 47% 11%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222 47% 11%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222 47% 11%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222 47% 11%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
   }
 }
 
@@ -79,16 +30,16 @@
   animation: gradientShift 15s ease infinite;
 }
 
-@keyframes gradientShift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+.glass-effect {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+}
+
+.glass-effect:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
 }
 
 .card-gradient {
@@ -99,26 +50,10 @@
   );
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
 }
 
-.card-gradient:hover {
-  border-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
-}
-
-.glass-effect {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.2s ease;
-}
-
-.glass-effect:hover:not(:disabled) {
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-.glass-effect:focus {
-  border-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
