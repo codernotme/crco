@@ -1,10 +1,6 @@
+import { Toaster } from '@/components/ui/toaster';
+import { AuthProvider } from '@/components/AuthProvider';
 import './globals.css';
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'Crco Bridge',
-  description: 'created by team 401 Unauthorized',
-};
 
 export default function RootLayout({
   children,
@@ -13,7 +9,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <AuthProvider>
+          {children}
+          <Toaster />
+        </AuthProvider>
+      </body>
     </html>
   );
 }

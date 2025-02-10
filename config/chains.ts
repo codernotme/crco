@@ -25,7 +25,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainInfo> = {
     tokenSymbol: 'CRCO',
     tokenAddress: process.env.NEXT_PUBLIC_POLYGON_TOKEN_ADDRESS ?? '',
     bridgeAddress: process.env.NEXT_PUBLIC_POLYGON_BRIDGE_ADDRESS ?? '',
-    icon: '/chains/polygon.svg',
+    icon: '/chains/polygon.png',
     coingeckoId: 'matic-network',
     nativeCurrency: {
       name: 'MATIC',
@@ -41,7 +41,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainInfo> = {
     tokenSymbol: 'CRCO',
     tokenAddress: process.env.NEXT_PUBLIC_BSC_TOKEN_ADDRESS ?? '',
     bridgeAddress: process.env.NEXT_PUBLIC_BSC_BRIDGE_ADDRESS ?? '',
-    icon: '/chains/bsc.svg',
+    icon: '/chains/bsc.png',
     coingeckoId: 'binancecoin',
     nativeCurrency: {
       name: 'BNB',
@@ -69,8 +69,8 @@ export const SUPPORTED_CHAINS: Record<string, ChainInfo> = {
 
 export const CHAIN_ICONS = {
   ethereum: '/chains/ethereum.svg',
-  polygon: '/chains/polygon.svg',
-  bsc: '/chains/bsc.svg',
+  polygon: '/chains/polygon.png',
+  bsc: '/chains/bsc.png',
   avalanche: '/chains/avalanche.svg'
 };
 
