@@ -20,13 +20,13 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { initiateTransfer } from '@/utils/initiateTransfer';
 
 export default function Home() {
-  const { connected, account, chainId, balance, connectWallet, updateBalances } = useWallet();
+  const { connected, account, chainId, balance, isInitializing, connectWallet, updateBalances } = useWallet();
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [transferState, setTransferState] = useState<TransferState>({
     amount: '',
-    sourceChain: 'ethereum' as 'ethereum' | 'polygon',
-    destinationChain: 'polygon' as 'ethereum' | 'polygon',
+    sourceChain: 'ethereum',
+    destinationChain: 'polygon',
     loading: false,
     error: null,
     isNFT: false,
@@ -54,8 +54,8 @@ export default function Home() {
       const tx = await initiateTransfer({
         account,
         amount: transferState.amount,
-        sourceChain: transferState.sourceChain as 'ethereum' | 'polygon',
-        destinationChain: transferState.destinationChain as 'ethereum' | 'polygon',
+        sourceChain: transferState.sourceChain,
+        destinationChain: transferState.destinationChain,
         isNFT: transferState.isNFT,
         tokenId: transferState.tokenId?.toString()
       });
@@ -71,7 +71,7 @@ export default function Home() {
           status: 'pending',
           timestamp: Date.now(),
           isNFT: transferState.isNFT,
-          tokenId: transferState.tokenId ? transferState.tokenId : undefined,
+          tokenId: transferState.tokenId,
         },
         ...prev,
       ]);
@@ -103,6 +103,7 @@ export default function Home() {
             isLoadingBalance={isLoadingBalance}
             onConnect={connectWallet}
             onRefreshBalance={handleRefreshBalance}
+            isInitializing={isInitializing}
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -117,8 +118,6 @@ export default function Home() {
           <PriceFeed />
           
           <div className="my-8" />
-
-          
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <div className="lg:col-span-2">

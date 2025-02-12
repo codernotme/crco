@@ -13,7 +13,7 @@ import { NFTPreview } from './NFTPreview';
 import { useWallet } from '@/hooks/useWallet';
 import { TwoFactorAuth } from './TwoFactorAuth';
 import { useToast } from '@/hooks/use-toast';
-import { ethers } from 'ethers';
+import { Contract, parseEther, formatEther } from 'ethers';
 
 interface TransferFormProps {
   state: TransferState;
@@ -48,14 +48,14 @@ export function TransferForm({
       if (!provider || !state.sourceChain) return;
 
       try {
-        const bridgeContract = new ethers.Contract(
+        const bridgeContract = new Contract(
           SUPPORTED_CHAINS[state.sourceChain].bridgeAddress,
           ['function bridgeFee() view returns (uint256)'],
           provider
         );
 
         const fee = await bridgeContract.bridgeFee();
-        setBridgeFee(ethers.utils.formatEther(fee));
+        setBridgeFee(formatEther(fee));
       } catch (err) {
         console.error('Failed to fetch bridge fee:', err);
       }
@@ -65,8 +65,8 @@ export function TransferForm({
   }, [provider, state.sourceChain]);
 
   useEffect(() => {
-    const amount = ethers.utils.parseEther(state.amount || '0');
-    setRequires2FA(amount.gte(ethers.utils.parseEther(HIGH_VALUE_THRESHOLD)));
+    const amount = parseEther(state.amount || '0');
+    setRequires2FA(amount >= parseEther(HIGH_VALUE_THRESHOLD));
   }, [state.amount]);
 
   const handleTransfer = async () => {

@@ -33,7 +33,7 @@ export function NetworkStatus({ chainId, connected, latency }: NetworkStatusProp
           <div>
             <h4 className="text-sm font-medium">Network Status</h4>
             <p className="text-xs text-white/60">
-              {currentNetwork?.name || 'Unknown Network'}
+              {currentNetwork?.name || 'Not Connected'}
             </p>
           </div>
         </div>
