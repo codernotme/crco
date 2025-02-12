@@ -1,19 +1,36 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createPublicClient, createWalletClient, custom, http } from 'viem';
 import { mainnet, polygon, bsc, avalanche } from 'viem/chains';
-import { WalletState, TransferReceipt } from '@/types';
+import { WalletState } from '@/types';
 import { SUPPORTED_CHAINS } from '@/config/chains';
+import { useToast } from '@/hooks/use-toast';
 
 export function useWallet() {
-  const [state, setState] = useState<WalletState>({
-    connected: false,
-    account: '',
-    chainId: '',
-    balance: {},
-    provider: null,
-    signer: null
+  const { toast } = useToast();
+  const [state, setState] = useState<WalletState>(() => {
+    // Try to restore connection from localStorage
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('walletConnection');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return {
+          ...parsed,
+          provider: null,
+          signer: null
+        };
+      }
+    }
+    return {
+      connected: false,
+      account: '',
+      chainId: '',
+      balance: {},
+      provider: null,
+      signer: null
+    };
   });
 
+  const [isInitializing, setIsInitializing] = useState(true);
   const isEthereumAvailable = typeof window !== 'undefined' && (window as any).ethereum;
 
   const publicClient = createPublicClient({
@@ -23,11 +40,29 @@ export function useWallet() {
 
   const connectWallet = useCallback(async () => {
     if (!isEthereumAvailable) {
-      console.error('MetaMask not detected');
+      toast({
+        title: "MetaMask Not Found",
+        description: "Please install MetaMask to use this feature",
+        variant: "destructive"
+      });
       return;
     }
 
     try {
+      if (state.connected) {
+        // Disconnect
+        setState({
+          connected: false,
+          account: '',
+          chainId: '',
+          balance: {},
+          provider: null,
+          signer: null
+        });
+        localStorage.removeItem('walletConnection');
+        return;
+      }
+
       const walletClient = createWalletClient({
         chain: mainnet,
         transport: custom((window as any).ethereum)
@@ -36,52 +71,90 @@ export function useWallet() {
       const [address] = await walletClient.requestAddresses();
       const chainId = await walletClient.getChainId();
 
-      setState(prev => ({
-        ...prev,
+      const newState = {
         connected: true,
         account: address,
         chainId: `0x${chainId.toString(16)}`,
         provider: publicClient,
-        signer: walletClient
+        signer: walletClient,
+        balance: {}
+      };
+
+      setState(newState);
+      localStorage.setItem('walletConnection', JSON.stringify({
+        connected: true,
+        account: address,
+        chainId: `0x${chainId.toString(16)}`,
+        balance: {}
       }));
 
       await updateBalances(address);
+
     } catch (err) {
       console.error('Failed to connect wallet:', err);
-    }
-  }, [isEthereumAvailable, publicClient]);
-
-  const switchNetwork = useCallback(async (chainId: string) => {
-    if (!isEthereumAvailable) return;
-
-    try {
-      await (window as any).ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId }],
+      toast({
+        title: "Connection Failed",
+        description: "Failed to connect to your wallet. Please try again.",
+        variant: "destructive"
       });
-    } catch (error: any) {
-      if (error.code === 4902) {
-        const chain = Object.values(SUPPORTED_CHAINS).find(c => c.id === chainId);
-        if (chain) {
-          await (window as any).ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [{
-              chainId: chain.id,
-              rpcUrls: [chain.rpcUrl],
-              chainName: chain.name,
-              nativeCurrency: chain.nativeCurrency,
-              blockExplorerUrls: [chain.explorerUrl]
-            }],
-          });
-        }
-      }
+      setState({
+        connected: false,
+        account: '',
+        chainId: '',
+        balance: {},
+        provider: null,
+        signer: null
+      });
+      localStorage.removeItem('walletConnection');
     }
-  }, [isEthereumAvailable]);
+  }, [isEthereumAvailable, publicClient, state.connected, toast]);
+
+  const handleAccountsChanged = useCallback(async (accounts: string[]) => {
+    if (accounts.length === 0) {
+      setState({
+        connected: false,
+        account: '',
+        chainId: '',
+        balance: {},
+        provider: null,
+        signer: null
+      });
+      localStorage.removeItem('walletConnection');
+      toast({
+        title: "Wallet Disconnected",
+        description: "Your wallet has been disconnected",
+      });
+    } else {
+      const newAccount = accounts[0];
+      setState(prev => ({ ...prev, account: newAccount }));
+      await updateBalances(newAccount);
+      localStorage.setItem('walletConnection', JSON.stringify({
+        connected: true,
+        account: newAccount,
+        chainId: state.chainId,
+        balance: state.balance
+      }));
+    }
+  }, [state.chainId, state.balance, toast]);
+
+  const handleChainChanged = useCallback(async (chainId: string) => {
+    setState(prev => ({ ...prev, chainId }));
+    if (state.account) {
+      await updateBalances(state.account);
+      localStorage.setItem('walletConnection', JSON.stringify({
+        connected: true,
+        account: state.account,
+        chainId,
+        balance: state.balance
+      }));
+    }
+  }, [state.account, state.balance]);
 
   const updateBalances = useCallback(async (account: string) => {
-    if (!publicClient) return;
+    if (!publicClient || !account) return;
 
     const balances: Record<string, string> = {};
+    let hasError = false;
 
     for (const [chainId, chain] of Object.entries(SUPPORTED_CHAINS)) {
       try {
@@ -102,107 +175,69 @@ export function useWallet() {
       } catch (err) {
         console.error(`Failed to fetch balance for ${chainId}:`, err);
         balances[chainId] = '0';
+        hasError = true;
       }
     }
 
     setState(prev => ({ ...prev, balance: balances }));
-  }, [publicClient]);
-
-  const initiateTransfer = useCallback(async (
-    recipient: string,
-    amount: string,
-    sourceChain: string,
-    destinationChain: string,
-    isNFT: boolean = false,
-    tokenId?: string
-  ) => {
-    if (!state.signer || !SUPPORTED_CHAINS[sourceChain]) {
-      throw new Error('Wallet not connected or invalid chain');
-    }
-
-    await switchNetwork(SUPPORTED_CHAINS[sourceChain].id);
-
-    const bridgeAddress = SUPPORTED_CHAINS[sourceChain].bridgeAddress;
     
-    try {
-      const { request } = await publicClient.simulateContract({
-        address: bridgeAddress as `0x${string}`,
-        abi: [{
-          inputs: [
-            { name: 'recipient', type: 'address' },
-            { name: 'amount', type: 'uint256' },
-            { name: 'destinationChain', type: 'uint256' },
-            { name: 'isNFT', type: 'bool' },
-            { name: 'tokenId', type: 'uint256' }
-          ],
-          name: 'initiateTransfer',
-          outputs: [],
-          stateMutability: 'payable',
-          type: 'function'
-        }],
-        functionName: 'initiateTransfer',
-        args: [
-          recipient as `0x${string}`,
-          BigInt(amount),
-          BigInt(parseInt(SUPPORTED_CHAINS[destinationChain].id, 16)),
-          isNFT,
-          BigInt(tokenId || 0)
-        ],
-        account: state.account as `0x${string}`
+    if (hasError) {
+      toast({
+        title: "Balance Update",
+        description: "Some balances could not be retrieved",
+        variant: "destructive"
       });
-
-      const hash = await (state.signer as any).writeContract(request);
-      const receipt = await publicClient.waitForTransactionReceipt({ hash });
-
-      return receipt;
-    } catch (err) {
-      console.error('Transfer failed:', err);
-      throw new Error('Transfer failed');
     }
-  }, [state.signer, state.account, switchNetwork, publicClient]);
+  }, [publicClient, toast]);
 
+  // Initialize connection on mount
   useEffect(() => {
-    if (!isEthereumAvailable) return;
-
-    const ethereum = (window as any).ethereum;
-
-    const handleAccountsChanged = (accounts: string[]) => {
-      if (accounts.length === 0) {
-        setState({
-          connected: false,
-          account: '',
-          chainId: '',
-          balance: {},
-          provider: null,
-          signer: null
-        });
-      } else {
-        setState(prev => ({ ...prev, account: accounts[0] }));
-        updateBalances(accounts[0]);
+    const initConnection = async () => {
+      if (isEthereumAvailable && state.connected) {
+        try {
+          const accounts = await (window as any).ethereum.request({
+            method: 'eth_accounts'
+          });
+          if (accounts.length > 0) {
+            await connectWallet();
+          } else {
+            setState({
+              connected: false,
+              account: '',
+              chainId: '',
+              balance: {},
+              provider: null,
+              signer: null
+            });
+            localStorage.removeItem('walletConnection');
+          }
+        } catch (err) {
+          console.error('Failed to initialize wallet connection:', err);
+        }
       }
+      setIsInitializing(false);
     };
 
-    const handleChainChanged = (chainId: string) => {
-      setState(prev => ({ ...prev, chainId }));
-      if (state.account) {
-        updateBalances(state.account);
-      }
-    };
+    initConnection();
+  }, [isEthereumAvailable, connectWallet, state.connected]);
 
-    ethereum.on('accountsChanged', handleAccountsChanged);
-    ethereum.on('chainChanged', handleChainChanged);
+  // Setup event listeners
+  useEffect(() => {
+    if (isEthereumAvailable && !isInitializing) {
+      (window as any).ethereum.on('accountsChanged', handleAccountsChanged);
+      (window as any).ethereum.on('chainChanged', handleChainChanged);
 
-    return () => {
-      ethereum.removeListener('accountsChanged', handleAccountsChanged);
-      ethereum.removeListener('chainChanged', handleChainChanged);
-    };
-  }, [isEthereumAvailable, state.account, updateBalances]);
+      return () => {
+        (window as any).ethereum.removeListener('accountsChanged', handleAccountsChanged);
+        (window as any).ethereum.removeListener('chainChanged', handleChainChanged);
+      };
+    }
+  }, [isEthereumAvailable, isInitializing, handleAccountsChanged, handleChainChanged]);
 
   return {
     ...state,
+    isInitializing,
     connectWallet,
-    updateBalances,
-    switchNetwork,
-    initiateTransfer
+    updateBalances
   };
 }

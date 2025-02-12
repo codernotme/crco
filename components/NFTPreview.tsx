@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { useSpring, animated } from 'react-spring';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ethers } from 'ethers';
+import { JsonRpcProvider, Contract } from 'ethers';
 
 interface NFTPreviewProps {
   tokenId: string;
@@ -30,10 +30,11 @@ export function NFTPreview({ tokenId, chainId, contractAddress }: NFTPreviewProp
   useEffect(() => {
     const fetchMetadata = async () => {
       try {
-        const contract = new ethers.Contract(
+        const provider = new JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL);
+        const contract = new Contract(
           contractAddress,
           ['function tokenURI(uint256) view returns (string)'],
-          new ethers.providers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL)
+          provider
         );
 
         const tokenURI = await contract.tokenURI(tokenId);
