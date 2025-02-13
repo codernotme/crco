@@ -1,4 +1,4 @@
-import { ethers } from "hardhat";
+import { ethers, run } from "hardhat";
 
 async function main() {
   const [deployer] = await ethers.getSigners();
@@ -39,15 +39,15 @@ async function main() {
   // Verify contracts on block explorer
   if (process.env.ETHERSCAN_API_KEY) {
     console.log("Verifying contracts...");
-    await hre.run("verify:verify", {
+    await run("verify:verify", {
       address: token.address,
       constructorArguments: [],
     });
-    await hre.run("verify:verify", {
+    await run("verify:verify", {
       address: nft.address,
       constructorArguments: [],
     });
-    await hre.run("verify:verify", {
+    await run("verify:verify", {
       address: bridge.address,
       constructorArguments: [],
     });

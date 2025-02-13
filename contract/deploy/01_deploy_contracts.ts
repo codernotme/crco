@@ -2,7 +2,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import fs from "fs";
 import path from "path";
-import { ethers } from "ethers";
+// import { ethers } from "ethers";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts, network } = hre;
@@ -33,9 +33,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   });
 
   // Setup roles
-  const CrCoToken = await ethers.getContractAt("CrCoToken", token.address);
-  const CrCoNFT = await ethers.getContractAt("CrCoNFT", nft.address);
-  const CrCoBridge = await ethers.getContractAt("CrCoBridge", bridge.address);
+  const CrCoToken = await hre.ethers.getContractAt("CrCoToken", token.address);
+  const CrCoNFT = await hre.ethers.getContractAt("CrCoNFT", nft.address);
+  const CrCoBridge = await hre.ethers.getContractAt("CrCoBridge", bridge.address);
 
   const MINTER_ROLE = await CrCoToken.MINTER_ROLE();
   const BURNER_ROLE = await CrCoToken.BURNER_ROLE();
