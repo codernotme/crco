@@ -1,3 +1,4 @@
+"use client";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import Navbar from './components/Navbar';
@@ -22,6 +23,11 @@ function App() {
           </Router>
         </NetworkProvider>
       </WalletProvider>
+
+      <footer className="text-center text-gray-500 text-xs py-4">
+        &copy; 2023 CrCo Bridge - All rights reserved.
+        <span className="block mt-2">Developed by Team 401 Unauthorized</span>
+      </footer>
     </div>
   );
 }

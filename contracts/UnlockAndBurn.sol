@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
+import "./ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 interface IBurnableToken {
@@ -48,7 +48,7 @@ contract UnlockAndBurn is ReentrancyGuard, Ownable {
     function addSupportedWrappedAsset(
         address wrappedAsset,
         address originalAsset,
-        AssetType assetType
+        AssetType /* assetType */
     ) external onlyOwner {
         require(wrappedAsset != address(0) && originalAsset != address(0), "Invalid addresses");
         supportedWrappedAssets[wrappedAsset] = true;

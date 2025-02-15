@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
+import "./ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 interface IMintableToken {
@@ -50,7 +50,7 @@ contract LockAndMint is ReentrancyGuard, Ownable {
     function addSupportedAsset(
         address asset,
         address wrappedVersion,
-        AssetType assetType
+        AssetType /* assetType */
     ) external onlyOwner {
         require(asset != address(0) && wrappedVersion != address(0), "Invalid addresses");
         supportedAssets[asset] = true;
