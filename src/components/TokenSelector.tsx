@@ -1,40 +1,22 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-
-interface Token {
-  symbol: string;
-  name: string;
-  icon: string;
-}
-
-const SUPPORTED_TOKENS: Token[] = [
-  {
-    symbol: 'ETH',
-    name: 'Ethereum',
-    icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.svg',
-  },
-  {
-    symbol: 'USDC',
-    name: 'USD Coin',
-    icon: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.svg',
-  },
-  {
-    symbol: 'USDT',
-    name: 'Tether',
-    icon: 'https://cryptologos.cc/logos/tether-usdt-logo.svg',
-  },
-];
+import { SUPPORTED_TOKENS, Token } from '../contexts/NetworkContext';
 
 interface TokenSelectorProps {
   value: string;
   onChange: (value: string) => void;
   disabled?: boolean;
+  filter?: 'ERC20' | 'ERC721' | 'all';
 }
 
-function TokenSelector({ value, onChange, disabled }: TokenSelectorProps) {
+function TokenSelector({ value, onChange, disabled, filter = 'all' }: TokenSelectorProps) {
+  const filteredTokens = SUPPORTED_TOKENS.filter(token => 
+    filter === 'all' ? true : token.type === filter
+  );
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-      {SUPPORTED_TOKENS.map((token) => (
+      {filteredTokens.map((token: Token) => (
         <motion.button
           key={token.symbol}
           whileHover={{ scale: 1.02 }}
@@ -54,7 +36,10 @@ function TokenSelector({ value, onChange, disabled }: TokenSelectorProps) {
           />
           <div className="text-left">
             <div className="font-medium">{token.symbol}</div>
-            <div className="text-sm text-gray-400">{token.name}</div>
+            <div className="text-sm text-gray-400">
+              {token.name}
+              <span className="ml-1 text-xs text-neon">{token.type}</span>
+            </div>
           </div>
         </motion.button>
       ))}
