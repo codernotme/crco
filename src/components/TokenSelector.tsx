@@ -2,17 +2,14 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { SUPPORTED_TOKENS, Token } from '../contexts/NetworkContext';
 
-interface TokenSelectorProps {
-  value: string;
-  onChange: (value: string) => void;
+export interface TokenSelectorProps {
+  selectedToken: string;
+  onChange: (token: string) => void;
   disabled?: boolean;
-  filter?: 'ERC20' | 'ERC721' | 'all';
 }
 
-function TokenSelector({ value, onChange, disabled, filter = 'all' }: TokenSelectorProps) {
-  const filteredTokens = SUPPORTED_TOKENS.filter(token => 
-    filter === 'all' ? true : token.type === filter
-  );
+function TokenSelector({ selectedToken, onChange, disabled }: TokenSelectorProps) {
+  const filteredTokens = SUPPORTED_TOKENS.filter(token => true);  // Simplified filter for now
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -24,7 +21,7 @@ function TokenSelector({ value, onChange, disabled, filter = 'all' }: TokenSelec
           onClick={() => onChange(token.symbol)}
           disabled={disabled}
           className={`flex items-center p-3 rounded-lg ${
-            value === token.symbol
+            selectedToken === token.symbol
               ? 'bg-neon bg-opacity-20 border border-neon'
               : 'bg-dark-200 hover:bg-dark-300'
           } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
