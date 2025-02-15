@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-dark text-white;
+}
+
+.glassmorphism {
+  @apply bg-dark-100/30 backdrop-blur-md border border-dark-300/50 rounded-xl;
+}
+
+.neon-glow {
+  text-shadow: 0 0 10px #39FF14, 0 0 20px #39FF14, 0 0 30px #39FF14;
+}
+
+.neon-border {
+  box-shadow: 0 0 10px #39FF14, 0 0 20px #39FF14;
+}

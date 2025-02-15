@@ -1,0 +1,51 @@
+{
+  "name": "crco-bridge",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "test": "hardhat test",
+    "compile": "hardhat compile",
+    "deploy:sepolia": "hardhat run scripts/deploy.ts --network sepolia",
+    "deploy:amoy": "hardhat run scripts/deploy.ts --network amoy"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "viem": "^2.7.9",
+    "framer-motion": "^11.0.5",
+    "lucide-react": "^0.344.0",
+    "react-router-dom": "^6.22.1",
+    "@tanstack/react-query": "^5.22.2",
+    "tailwind-merge": "^2.2.1",
+    "clsx": "^2.1.0",
+    "date-fns": "^3.3.1",
+    "@openzeppelin/contracts": "^5.0.1",
+    "ethers": "^6.11.1",
+    "react-hot-toast": "^2.4.1",
+    "react-loading-skeleton": "^3.4.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.9.1",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.18",
+    "eslint": "^9.9.1",
+    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
+    "eslint-plugin-react-refresh": "^0.4.11",
+    "globals": "^15.9.0",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.5.3",
+    "typescript-eslint": "^8.3.0",
+    "vite": "^5.4.2",
+    "hardhat": "^2.19.4",
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "dotenv": "^16.4.5"
+  }
+}
