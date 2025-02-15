@@ -1,7 +1,6 @@
-import { HardhatUserConfig } from "hardhat/config";
-import "@nomicfoundation/hardhat-toolbox";
+require("@nomicfoundation/hardhat-toolbox");
 
-const config: HardhatUserConfig = {
+const config = {
   solidity: "0.8.24",
   networks: {
     sepolia: {
@@ -15,4 +14,4 @@ const config: HardhatUserConfig = {
   },
 };
 
-export default config;
+module.exports = config;

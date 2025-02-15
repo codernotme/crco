@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { Network, useNetwork } from '../contexts/NetworkContext';
 
 interface NetworkSelectorProps {

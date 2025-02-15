@@ -1,23 +1,22 @@
 import { useCallback, useMemo } from 'react';
-import { parseEther, formatEther, createPublicClient, http, createWalletClient, custom } from 'viem';
+import { parseEther, createPublicClient, http, createWalletClient, custom, Chain } from 'viem';
 import { useWallet } from '../contexts/WalletContext';
 import { Network } from '../contexts/NetworkContext';
 import { bridgeABI } from '../contracts/abi/Bridge';
-import toast from 'react-hot-toast';
 
 export function useBridgeContract(network: Network) {
   const { account } = useWallet();
 
   const publicClient = useMemo(() => 
     createPublicClient({
-      chain: network.chainId,
+      chain: { id: network.chainId } as Chain,
       transport: http(network.rpcUrl)
     }),
   [network]);
 
   const walletClient = useMemo(() => 
     window.ethereum ? createWalletClient({
-      chain: network.chainId,
+      chain: { id: network.chainId } as unknown as Chain,
       transport: custom(window.ethereum)
     }) : null,
   [network]);
@@ -47,10 +46,11 @@ export function useBridgeContract(network: Network) {
       
       // First approve the bridge contract
       const approvalHash = await walletClient.writeContract({
-        address: tokenAddress,
+        address: tokenAddress as `0x${string}`,
         abi: ['function approve(address spender, uint256 amount) returns (bool)'],
         functionName: 'approve',
-        args: [bridgeAddress, parsedAmount]
+        args: [bridgeAddress, parsedAmount],
+        account: null
       });
 
       await publicClient.waitForTransactionReceipt({ hash: approvalHash });
@@ -60,7 +60,8 @@ export function useBridgeContract(network: Network) {
         address: bridgeAddress,
         abi: bridgeABI,
         functionName: 'lockTokens',
-        args: [tokenAddress, parsedAmount, targetChainId]
+        args: [tokenAddress as `0x${string}`, parsedAmount, BigInt(targetChainId)],
+        account: null
       });
 
       return hash;
@@ -87,7 +88,8 @@ export function useBridgeContract(network: Network) {
         address: bridgeAddress,
         abi: bridgeABI,
         functionName: 'unlockTokens',
-        args: [tokenAddress, to, parsedAmount, transactionHash]
+        args: [tokenAddress as `0x${string}`, to as `0x${string}`, parsedAmount, transactionHash as `0x${string}`],
+        account: null
       });
 
       return hash;

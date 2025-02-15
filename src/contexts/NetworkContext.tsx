@@ -12,13 +12,13 @@ const SUPPORTED_NETWORKS: Network[] = [
     id: 'sepolia',
     name: 'Sepolia',
     chainId: 11155111,
-    rpcUrl: 'https://rpc.sepolia.org',
+    rpcUrl: process.env.SEPOLIA_URL as string,
   },
   {
     id: 'amoy',
     name: 'Amoy',
     chainId: 80001,
-    rpcUrl: 'https://polygon-mumbai.infura.io/v3/YOUR-PROJECT-ID',
+    rpcUrl: process.env.AMOY_URL as string,
   },
 ];
 

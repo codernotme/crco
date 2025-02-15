@@ -1,5 +1,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { createWalletClient, custom } from 'viem';
+
+declare global {
+  interface Window {
+    ethereum: {
+      request: (args: { method: string }) => Promise<string[]>;
+      on: (event: string, handler: (accounts: string[]) => void) => void;
+      removeListener: (event: string, handler: () => void) => void;
+    };
+  }
+}
 
 interface WalletContextType {
   account: string | null;
