@@ -4,25 +4,39 @@ import { useWallet } from '../contexts/WalletContext';
 import { Network } from '../contexts/NetworkContext';
 import { bridgeABI } from '../contracts/abi/Bridge';
 
-export function useBridgeContract(network: Network) {
+export function useBridgeContract(network: Network | null) {
   const { account } = useWallet();
 
-  const publicClient = useMemo(() => 
-    createPublicClient({
-      chain: { id: network.chainId } as Chain,
-      transport: http(network.rpcUrl)
-    }),
-  [network]);
+  const client = useMemo(() => {
+    if (!network) return null;
+    
+    return createPublicClient({
+      chain: {
+        id: network.chainId,
+        name: network.name,
+        nativeCurrency: network.nativeCurrency,
+        rpcUrls: {
+          default: {
+            http: [network.rpcUrl],
+          },
+          public: {
+            http: [network.rpcUrl],
+          },
+        },
+      } as Chain,
+      transport: http(),
+    });
+  }, [network]);
 
   const walletClient = useMemo(() => 
     window.ethereum ? createWalletClient({
-      chain: { id: network.chainId } as unknown as Chain,
+      chain: { id: network?.chainId } as unknown as Chain,
       transport: custom(window.ethereum)
     }) : null,
   [network]);
 
   const bridgeAddress = useMemo(() => {
-    switch (network.id) {
+    switch (network?.id) {
       case 'sepolia':
         return import.meta.env.VITE_SEPOLIA_BRIDGE_ADDRESS;
       case 'amoy':
@@ -53,7 +67,7 @@ export function useBridgeContract(network: Network) {
         account: null
       });
 
-      await publicClient.waitForTransactionReceipt({ hash: approvalHash });
+      await client?.waitForTransactionReceipt({ hash: approvalHash });
 
       // Then lock the tokens
       const hash = await walletClient.writeContract({
@@ -69,7 +83,7 @@ export function useBridgeContract(network: Network) {
       console.error('Error locking tokens:', error);
       throw error;
     }
-  }, [account, walletClient, bridgeAddress, publicClient]);
+  }, [account, walletClient, bridgeAddress, client]);
 
   const unlockTokens = useCallback(async (
     tokenAddress: string,

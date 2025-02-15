@@ -1,23 +1,24 @@
 import React from 'react';
 import { Network, useNetwork } from '../contexts/NetworkContext';
 
-interface NetworkSelectorProps {
-  value: Network | null;
+export interface NetworkSelectorProps {
+  networks: Network[];
+  selectedNetwork: Network | null;
   onChange: (network: Network) => void;
   disabled?: boolean;
   exclude?: string;
 }
 
-function NetworkSelector({ value, onChange, disabled, exclude }: NetworkSelectorProps) {
-  const { networks } = useNetwork();
-  const availableNetworks = networks.filter(network => network.id !== exclude);
+function NetworkSelector({ selectedNetwork, onChange, disabled, exclude }: NetworkSelectorProps) {
+  const { networks: contextNetworks } = useNetwork();
+  const availableNetworks = contextNetworks.filter(network => network.id !== exclude);
 
   return (
     <div className="relative">
       <select
-        value={value?.id || ''}
+        value={selectedNetwork?.id || ''}
         onChange={(e) => {
-          const network = networks.find(n => n.id === e.target.value);
+          const network = contextNetworks.find(n => n.id === e.target.value);
           if (network) onChange(network);
         }}
         disabled={disabled}

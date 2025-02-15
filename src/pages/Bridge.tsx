@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import{ useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRightLeft, Info, Lock, Unlock } from 'lucide-react';
 import { useWallet } from '../contexts/WalletContext';
@@ -17,10 +17,10 @@ import toast from 'react-hot-toast';
 
 function Bridge() {
   const { account } = useWallet();
-  const { networks, selectedNetwork } = useNetwork();
+  const { networks, selectedNetwork, setSelectedNetwork } = useNetwork();
   const [bridgeMode, setBridgeMode] = useState<'lock' | 'unlock'>('lock');
   const [amount, setAmount] = useState('');
-  const [targetNetwork, setTargetNetwork] = useState<Network | null>(null);
+  const [targetNetwork, setTargetNetwork] = useState<Network | null>(networks[1] || null);
   const [selectedToken, setSelectedToken] = useState<string>('');
   
   const { bridgeTokens, isProcessing } = useBridge(selectedNetwork!, targetNetwork);
@@ -120,6 +120,58 @@ function Bridge() {
                   isProcessing={isProcessing}
                 />
               )}
+
+              <div className="space-y-6 mt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Source Network</label>
+                    <NetworkSelector 
+                      networks={networks}
+                      selectedNetwork={selectedNetwork}
+                      onChange={(network) => setSelectedNetwork(network)}
+                      disabled={isProcessing}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Target Network</label>
+                    <NetworkSelector 
+                      networks={networks.filter(n => n !== selectedNetwork)}
+                      selectedNetwork={targetNetwork}
+                      onChange={setTargetNetwork}
+                      disabled={isProcessing}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Select Token</label>
+                  <TokenSelector
+                    selectedToken={selectedToken}
+                    onChange={setSelectedToken}
+                    disabled={isProcessing}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Amount</label>
+                  <input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    className="w-full p-2 rounded-lg bg-dark-200 border border-dark-300 focus:border-neon focus:ring-1 focus:ring-neon"
+                    placeholder="Enter amount"
+                    disabled={isProcessing}
+                  />
+                </div>
+
+                <button
+                  onClick={handleBridge}
+                  disabled={!account || !selectedNetwork || !targetNetwork || !amount || !selectedToken || isProcessing}
+                  className="w-full py-3 px-4 bg-neon text-dark font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isProcessing ? 'Processing...' : 'Bridge Tokens'}
+                </button>
+              </div>
 
               <GasFeeCalculator
                 sourceNetwork={selectedNetwork}
