@@ -24,7 +24,7 @@ function App() {
       </WalletProvider>
 
       <footer className="text-center text-gray-500 text-xs py-4">
-        &copy; 2023 CrCo Bridge - All rights reserved.
+        &copy; 2025 CrCo Bridge - All rights reserved.
         <span className="block mt-2">Developed by Team 401 Unauthorized</span>
       </footer>
     </div>
