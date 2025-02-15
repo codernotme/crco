@@ -74,13 +74,25 @@ export function useTransactionHistory(): Transaction[] {
         id: 'sepolia',
         name: 'Sepolia',
         chainId: 11155111,
-        rpcUrl: 'https://rpc.sepolia.org'
+        rpcUrl: 'https://rpc.sepolia.org',
+        explorerUrl: 'https://sepolia.etherscan.io',
+        nativeCurrency: {
+          name: 'Ethereum',
+          symbol: 'ETH',
+          decimals: 18
+        }
       },
       to: {
         id: 'amoy',
         name: 'Amoy',
         chainId: 80001,
-        rpcUrl: 'https://polygon-mumbai.infura.io/v3/YOUR-PROJECT-ID'
+        rpcUrl: 'https://polygon-mumbai.infura.io/v3/YOUR-PROJECT-ID',
+        explorerUrl: 'https://mumbai.polygonscan.com',
+        nativeCurrency: {
+          name: 'Matic',
+          symbol: 'MATIC',
+          decimals: 18
+        }
       },
       amount: '1.5',
       token: 'ETH',
