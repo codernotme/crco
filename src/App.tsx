@@ -25,7 +25,7 @@ function App() {
 
       <footer className="text-center text-gray-500 text-xs py-4">
         &copy; 2025 CrCo Bridge - All rights reserved.
-        <span className="block mt-2">Developed by Team 401 Unauthorized</span>
+        <span className="block mt-2">Developed by Team 401 Unauthorised</span>
       </footer>
     </div>
   );

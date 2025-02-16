@@ -2,6 +2,9 @@ const hre = require("hardhat");
 
 async function main() {
   const [deployer] = await hre.ethers.getSigners();
+  if (!deployer) {
+    throw new Error("No deployer account found");
+  }
   console.log("Deploying contracts with the account:", deployer.address);
 
   // Deploy TokenFactory
