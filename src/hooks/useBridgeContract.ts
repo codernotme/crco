@@ -12,7 +12,7 @@ export function useBridgeContract(network: Network | null) {
     
     return createPublicClient({
       chain: {
-        id: network.chainId,
+          id: network.chainId,
         name: network.name,
         nativeCurrency: network.nativeCurrency,
         rpcUrls: {
