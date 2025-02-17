@@ -2,9 +2,9 @@
 pragma solidity ^0.8.24;
 
 import "./ReentrancyGuard.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "./custom/IERC20.sol";
+import "./custom/IERC721.sol";
+import "./custom/Ownable.sol";
 
 interface IMintableToken {
     function mint(address to, uint256 amount) external;

@@ -77,7 +77,7 @@ contract EntryPoint is IEntryPoint, ReentrancyGuard {
         }
     }
 
-    function _executeUserOp(UserOperation calldata userOp, bytes32 userOpHash) internal {
+    function _executeUserOp(UserOperation calldata userOp, bytes32 /* userOpHash */) internal {
         uint256 preGas = gasleft();
         
         // Execute the operation

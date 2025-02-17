@@ -2,8 +2,8 @@
 pragma solidity ^0.8.24;
 
 import "./ReentrancyGuard.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "./custom/IERC20.sol";
+import "./custom/Ownable.sol";
 
 contract Bridge is ReentrancyGuard, Ownable {
     mapping(address => mapping(bytes32 => bool)) public processedHashes;
