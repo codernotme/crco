@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Network } from '../contexts/NetworkContext';
 import { useWallet } from '../contexts/WalletContext';
 import NetworkSelector from './NetworkSelector';
@@ -28,6 +28,11 @@ function LockAndMint({
   isProcessing
 }: LockAndMintProps) {
   const { account } = useWallet();
+  const [sourceNetwork, setSourceNetwork] = useState<Network | null>(selectedNetwork);
+
+  const handleSourceNetworkChange = (network: Network) => {
+    setSourceNetwork(network);
+  };
 
   return (
     <div className="space-y-6">
@@ -35,9 +40,10 @@ function LockAndMint({
         <div>
           <label className="block text-sm font-medium mb-2">Source Network (Lock)</label>
           <NetworkSelector
-            value={selectedNetwork}
-            onChange={() => {}}
-            disabled={false}
+            value={sourceNetwork}
+            onChange={handleSourceNetworkChange}
+            disabled={!account}
+            exclude={targetNetwork?.id}
           />
         </div>
         <div>
@@ -46,7 +52,7 @@ function LockAndMint({
             value={targetNetwork}
             onChange={onTargetNetworkChange}
             disabled={!account}
-            exclude={selectedNetwork?.id}
+            exclude={sourceNetwork?.id}
           />
         </div>
       </div>

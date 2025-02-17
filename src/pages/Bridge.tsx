@@ -16,7 +16,7 @@ import toast from 'react-hot-toast';
 function Bridge() {
   const { account } = useWallet();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { networks, selectedNetwork, setSelectedNetwork } = useNetwork();
+  const { networks, selectedNetwork } = useNetwork();
   const [bridgeMode, setBridgeMode] = useState<'lock' | 'unlock'>('lock');
   const [amount, setAmount] = useState('');
   const [targetNetwork, setTargetNetwork] = useState<Network | null>(networks[1] || null);

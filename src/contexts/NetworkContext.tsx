@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from 'react';
 
 // Define the Token type
-type Token = {
+export type Token = {
   symbol: string;
   name: string;
   icon: string;
@@ -69,11 +69,12 @@ export const SUPPORTED_TOKENS: Token[] = [
 export interface Network {
   id: string;
   name: string;
+  explorerUrl: string;
 }
 
 interface NetworkContextProps {
   networks: Network[];
-  currentNetwork: Network | null;
+  selectedNetwork: Network | null;
   setCurrentNetwork: (network: Network) => void;
 }
 
@@ -85,13 +86,13 @@ interface NetworkProviderProps {
 
 export const NetworkProvider: React.FC<NetworkProviderProps> = ({ children }) => {
   const [networks] = useState<Network[]>([
-    { id: '1', name: 'Network 1' },
-    { id: '2', name: 'Network 2' },
+    { id: 'sepolia', name: 'Sepolia', explorerUrl: 'https://sepolia.etherscan.io' },
+    { id: 'amoy', name: 'Amoy', explorerUrl: 'https://mumbai.polygonscan.com' },
   ]);
   const [currentNetwork, setCurrentNetwork] = useState<Network | null>(null);
 
   return (
-    <NetworkContext.Provider value={{ networks, currentNetwork, setCurrentNetwork }}>
+    <NetworkContext.Provider value={{ networks, selectedNetwork: currentNetwork, setCurrentNetwork }}>
       {children}
     </NetworkContext.Provider>
   );

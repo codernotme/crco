@@ -9,7 +9,7 @@ export interface TokenSelectorProps {
 }
 
 function TokenSelector({ selectedToken, onChange, disabled }: TokenSelectorProps) {
-  const filteredTokens = SUPPORTED_TOKENS.filter(token => true);  // Simplified filter for now
+  const filteredTokens = SUPPORTED_TOKENS.filter(token => token.type === 'ERC20');
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

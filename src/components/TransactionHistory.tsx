@@ -33,14 +33,10 @@ function TransactionHistory({ transactions }: TransactionHistoryProps) {
   };
 
   const getExplorerUrl = (network: Network, hash: string) => {
-    switch (network.id) {
-      case 'sepolia':
-        return `https://sepolia.etherscan.io/tx/${hash}`;
-      case 'amoy':
-        return `https://mumbai.polygonscan.com/tx/${hash}`;
-      default:
-        return '#';
+    if (network.explorerUrl) {
+      return `${network.explorerUrl}/tx/${hash}`;
     }
+    return '#';
   };
 
   return (

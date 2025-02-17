@@ -5,7 +5,7 @@ import { Wallet, Grid as BridgeIcon, LogOut } from 'lucide-react';
 import { useWallet } from '../contexts/WalletContext';
 
 function Navbar() {
-  const { account, connect, disconnect, isConnecting } = useWallet();
+  const { account, connect, disconnect, isConnecting, balance } = useWallet();
 
   return (
     <nav className="fixed top-0 w-full bg-dark-100/80 backdrop-blur-sm border-b border-dark-300 z-50">
@@ -42,7 +42,7 @@ function Navbar() {
             {account && (
               <div className="px-4 py-2 rounded-lg bg-dark-200">
                 <span className="text-sm text-gray-400">Balance:</span>
-                <span className="ml-2 font-medium">0.00 ETH</span>
+                <span className="ml-2 font-medium">{balance} ETH</span>
               </div>
             )}
             
