@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "./Pausable.sol";
+import "./custom/Pausable.sol";
 
 contract BridgeValidator is Pausable {
     mapping(address => bool) public validators;
@@ -16,7 +16,7 @@ contract BridgeValidator is Pausable {
     event ValidatorAdded(address indexed validator);
     event ValidatorRemoved(address indexed validator);
     
-    constructor(uint256 _requiredValidations, uint256 _validationTimeout) {
+    constructor(uint256 _requiredValidations, uint256 _validationTimeout) Ownable(msg.sender) {
         require(_requiredValidations > 0, "Invalid required validations");
         require(_validationTimeout > 0, "Invalid validation timeout");
         requiredValidations = _requiredValidations;

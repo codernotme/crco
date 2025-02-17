@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 import "./ReentrancyGuard.sol";
-import "./Pausable.sol";
+import "./custom/Pausable.sol";
 import "./IEntryPoint.sol";
 
 contract TokenBridge is ReentrancyGuard, Pausable {
@@ -44,7 +44,7 @@ contract TokenBridge is ReentrancyGuard, Pausable {
         bytes32 operationId
     );
 
-    constructor(address _entryPoint) {
+    constructor(address _entryPoint) Ownable(msg.sender) {
         require(_entryPoint != address(0), "Invalid EntryPoint address");
         entryPoint = IEntryPoint(_entryPoint);
     }

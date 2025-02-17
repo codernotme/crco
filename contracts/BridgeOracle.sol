@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "./Pausable.sol";
+import "./custom/Pausable.sol";
+import "./custom/Ownable.sol";
 
 contract BridgeOracle is Pausable {
     mapping(address => bool) public authorizedOracles;
@@ -15,7 +16,7 @@ contract BridgeOracle is Pausable {
     event OracleAuthorized(address indexed oracle);
     event OracleDeauthorized(address indexed oracle);
     
-    constructor(uint8 _requiredConfirmations) {
+    constructor(uint8 _requiredConfirmations) Ownable(msg.sender) {
         require(_requiredConfirmations > 0, "Required confirmations must be > 0");
         requiredConfirmations = _requiredConfirmations;
         authorizedOracles[msg.sender] = true;

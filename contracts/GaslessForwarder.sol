@@ -1,12 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "./custom/Ownable.sol";
 
 contract GaslessForwarder is Ownable {
-    using ECDSA for bytes32;
-
     mapping(bytes32 => bool) public executed;
     mapping(address => uint256) public nonces;
     
@@ -38,8 +35,10 @@ contract GaslessForwarder is Ownable {
             )
         );
 
-        bytes32 messageHash = ECDSA.toEthSignedMessageHash(hash);
-        address signer = messageHash.recover(signature);
+        bytes32 messageHash = keccak256(
+            abi.encodePacked("\x19Ethereum Signed Message:\n32", hash)
+        );
+        address signer = recoverSigner(messageHash, signature);
         
         require(signer == from, "Invalid signature");
         require(!executed[hash], "Request already executed");
@@ -53,6 +52,28 @@ contract GaslessForwarder is Ownable {
         emit RequestExecuted(from, to, data, nonce);
         
         return (success, result);
+    }
+
+    function recoverSigner(bytes32 messageHash, bytes memory signature) internal pure returns (address) {
+        require(signature.length == 65, "Invalid signature length");
+
+        bytes32 r;
+        bytes32 s;
+        uint8 v;
+
+        assembly {
+            r := mload(add(signature, 32))
+            s := mload(add(signature, 64))
+            v := byte(0, mload(add(signature, 96)))
+        }
+
+        if (v < 27) {
+            v += 27;
+        }
+
+        require(v == 27 || v == 28, "Invalid signature 'v' value");
+
+        return ecrecover(messageHash, v, r, s);
     }
 
     function getNonce(address from) external view returns (uint256) {

@@ -4,6 +4,7 @@ pragma solidity ^0.8.24;
 import "./IEntryPoint.sol";
 import "./Pausable.sol";
 import "./ReentrancyGuard.sol";
+
 abstract contract Paymaster is Pausable, ReentrancyGuard {
     IEntryPoint public immutable entryPoint;
     mapping(address => bool) public supportedTokens;
@@ -18,7 +19,7 @@ abstract contract Paymaster is Pausable, ReentrancyGuard {
 
     function validatePaymasterUserOp(
         IEntryPoint.UserOperation calldata userOp,
-        bytes32 userOpHash,
+        bytes32,  // userOpHash
         uint256 maxCost
     ) external view returns (bytes memory context, uint256 validationData) {
         // Verify the token is supported
@@ -33,7 +34,7 @@ abstract contract Paymaster is Pausable, ReentrancyGuard {
     }
     
     function postOp(
-        IEntryPoint.UserOperation calldata userOp,
+        IEntryPoint.UserOperation calldata,  // userOp
         bytes calldata context,
         uint256 actualGasCost
     ) external {
