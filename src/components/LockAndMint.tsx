@@ -37,7 +37,7 @@ function LockAndMint({
           <NetworkSelector
             value={selectedNetwork}
             onChange={() => {}}
-            disabled={true}
+            disabled={false}
           />
         </div>
         <div>
@@ -54,7 +54,7 @@ function LockAndMint({
       <div>
         <label className="block text-sm font-medium mb-2">Select Token to Lock</label>
         <TokenSelector
-          value={selectedToken}
+          selectedToken={selectedToken}
           onChange={onTokenChange}
           disabled={!account}
         />

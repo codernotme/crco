@@ -1,55 +1,18 @@
 import React, { createContext, useContext, useState } from 'react';
 
-export interface Network {
-  id: string;
-  name: string;
-  chainId: number;
-  rpcUrl: string;
-  explorerUrl: string;
-  nativeCurrency: {
-    name: string;
-    symbol: string;
-    decimals: number;
-  };
-}
-
-export interface Token {
+// Define the Token type
+type Token = {
   symbol: string;
   name: string;
   icon: string;
   type: 'ERC20' | 'ERC721';
   address: {
-    [networkId: string]: `0x${string}`;
+    sepolia: `0x${string}`;
+    amoy: `0x${string}`;
   };
-}
+};
 
-const SUPPORTED_NETWORKS: Network[] = [
-  {
-    id: 'sepolia',
-    name: 'Sepolia',
-    chainId: 11155111,
-    rpcUrl: import.meta.env.VITE_SEPOLIA_RPC_URL,
-    explorerUrl: 'https://sepolia.etherscan.io',
-    nativeCurrency: {
-      name: 'Sepolia Ether',
-      symbol: 'ETH',
-      decimals: 18,
-    },
-  },
-  {
-    id: 'amoy',
-    name: 'Amoy',
-    chainId: 80001,
-    rpcUrl: import.meta.env.VITE_AMOY_RPC_URL,
-    explorerUrl: 'https://testnet.amoy.xyz/explorer',
-    nativeCurrency: {
-      name: 'Amoy Ether',
-      symbol: 'ETH',
-      decimals: 18,
-    },
-  },
-];
-
+// Update the SUPPORTED_TOKENS array with BAYC and PUNK images
 export const SUPPORTED_TOKENS: Token[] = [
   {
     symbol: 'ETH',
@@ -84,7 +47,7 @@ export const SUPPORTED_TOKENS: Token[] = [
   {
     symbol: 'BAYC',
     name: 'Bored Ape Yacht Club',
-    icon: 'https://cryptologos.cc/logos/bored-ape-yacht-club-bayc-logo.svg',
+    icon: 'https://i.seadn.io/gae/Ju9CkWtV-1Okvf45wo8UctR-M9He2PjILP0oOvxE89AyiPPGtrR3gysu1Zgy0hjd2xKIgjJJtWIc0ybj4Vd7wv8t3pxDGHoJBzDB?auto=format&w=1000',
     type: 'ERC721',
     address: {
       sepolia: import.meta.env.VITE_BAYC_ADDRESS_SEPOLIA as `0x${string}`,
@@ -94,7 +57,7 @@ export const SUPPORTED_TOKENS: Token[] = [
   {
     symbol: 'PUNK',
     name: 'CryptoPunks',
-    icon: 'https://cryptologos.cc/logos/cryptopunks-punk-logo.svg',
+    icon: 'https://i.seadn.io/gae/BdxvLseXcfl57BiuQcQYdJ64v-aI8din7WPk0Pgo3qQFhAUH-B6i-dCqqc_mCkRIzULmwzwecnohLhrcH8A9mpWIZqA7ygc52Sr81hE?auto=format&w=1000',
     type: 'ERC721',
     address: {
       sepolia: import.meta.env.VITE_PUNK_ADDRESS_SEPOLIA as `0x${string}`,
@@ -103,47 +66,41 @@ export const SUPPORTED_TOKENS: Token[] = [
   },
 ];
 
-interface NetworkContextType {
-  networks: Network[];
-  selectedNetwork: Network | null;
-  setSelectedNetwork: (network: Network) => void;
-  getTokenBySymbol: (symbol: string) => Token | undefined;
-  getTokenAddress: (symbol: string, networkId: string) => `0x${string}` | undefined;
+export interface Network {
+  id: string;
+  name: string;
 }
 
-const NetworkContext = createContext<NetworkContextType | undefined>(undefined);
+interface NetworkContextProps {
+  networks: Network[];
+  currentNetwork: Network | null;
+  setCurrentNetwork: (network: Network) => void;
+}
 
-export function NetworkProvider({ children }: { children: React.ReactNode }) {
-  const [selectedNetwork, setSelectedNetwork] = useState<Network | null>(SUPPORTED_NETWORKS[0]);
+const NetworkContext = createContext<NetworkContextProps | undefined>(undefined);
 
-  const getTokenBySymbol = (symbol: string) => {
-    return SUPPORTED_TOKENS.find(token => token.symbol === symbol);
-  };
+interface NetworkProviderProps {
+  children: React.ReactNode;
+}
 
-  const getTokenAddress = (symbol: string, networkId: string) => {
-    const token = getTokenBySymbol(symbol);
-    return token?.address[networkId];
-  };
+export const NetworkProvider: React.FC<NetworkProviderProps> = ({ children }) => {
+  const [networks] = useState<Network[]>([
+    { id: '1', name: 'Network 1' },
+    { id: '2', name: 'Network 2' },
+  ]);
+  const [currentNetwork, setCurrentNetwork] = useState<Network | null>(null);
 
   return (
-    <NetworkContext.Provider
-      value={{
-        networks: SUPPORTED_NETWORKS,
-        selectedNetwork,
-        setSelectedNetwork,
-        getTokenBySymbol,
-        getTokenAddress,
-      }}
-    >
+    <NetworkContext.Provider value={{ networks, currentNetwork, setCurrentNetwork }}>
       {children}
     </NetworkContext.Provider>
   );
-}
+};
 
-export function useNetwork() {
+export const useNetwork = () => {
   const context = useContext(NetworkContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useNetwork must be used within a NetworkProvider');
   }
   return context;
-}
+};

@@ -29,14 +29,12 @@ function Navbar() {
               >
                 Bridge
               </Link>
-              <a
-                href="https://docs.example.com"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                to="/about"
                 className="px-3 py-2 rounded-lg hover:bg-dark-200 transition-colors"
               >
-                Docs
-              </a>
+                About
+              </Link>
             </div>
           </div>
 

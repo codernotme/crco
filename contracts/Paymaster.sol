@@ -3,8 +3,8 @@ pragma solidity ^0.8.24;
 
 import "./IEntryPoint.sol";
 import "./Pausable.sol";
-
-contract Paymaster is Pausable {
+import "./ReentrancyGuard.sol";
+abstract contract Paymaster is Pausable, ReentrancyGuard {
     IEntryPoint public immutable entryPoint;
     mapping(address => bool) public supportedTokens;
     
